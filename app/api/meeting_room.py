@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from app.crud.meeting_room import create_meeting_room
 from app.schemas.meeting_room import MeetingRoomCreate
 
-
 router = APIRouter()
 
 
