@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class MeetingRoomBase(BaseModel):
@@ -20,3 +20,12 @@ class MeetingRoomDB(MeetingRoomBase):
 
     class Config:
         orm_mode = True
+
+
+class MeetingRoomUpdate(MeetingRoomBase):
+    @validator('name')
+    def name_cannot_null(cls, value):
+        if value is None:
+            raise ValueError('Имя не может быть пустым')
+
+        return value
