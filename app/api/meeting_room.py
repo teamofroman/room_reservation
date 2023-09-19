@@ -6,7 +6,7 @@ from app.crud.meeting_room import (create_meeting_room, get_room_id_by_name,
                                    read_all_rooms_db)
 from app.schemas.meeting_room import MeetingRoomCreate, MeetingRoomDB
 
-router = APIRouter(prefix='/meeting_rooms')
+router = APIRouter(prefix='/meeting_rooms', tags=['Meeting rooms'])
 
 
 @router.post(
