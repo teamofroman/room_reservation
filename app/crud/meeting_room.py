@@ -1,7 +1,9 @@
 from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.db import AsyncSessionLocal
+
+# from app.core.db import AsyncSessionLocal
 from app.models.meeting_room import MeetingRoom
 from app.schemas.meeting_room import MeetingRoomCreate
 
@@ -34,3 +36,9 @@ async def create_meeting_room(
     await session.refresh(db_room)
 
     return db_room
+
+
+async def read_all_rooms_db(session: AsyncSession):
+    db_rooms = await session.execute(select(MeetingRoom))
+    db_rooms = db_rooms.scalars().all()
+    return db_rooms
