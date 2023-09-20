@@ -1,45 +1,20 @@
-from typing import Optional
-
 from fastapi.encoders import jsonable_encoder
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from app.core.db import AsyncSessionLocal
-from app.models.meeting_room import MeetingRoom
-from app.schemas.meeting_room import MeetingRoomCreate, MeetingRoomUpdate
+from app.models.meeting_room import ModelMeetingRoom
+from app.schemas.meeting_room import (
+    SchemasMeetingRoomCreate,
+    SchemasMeetingRoomUpdate,
+)
 
 
-async def get_room_id_by_name(
-        room_name: str, session: AsyncSession
-) -> Optional[int]:
-    # async with AsyncSessionLocal() as session:
-    db_room_id = await session.execute(
-        select(MeetingRoom.id).where(
-            MeetingRoom.name == room_name,
-        )
-    )
-    db_room_id = db_room_id.scalars().first()
-    return db_room_id
-
-
-async def get_room_by_id(
-        room_id: int, session: AsyncSession
-) -> Optional[MeetingRoom]:
-    db_room = await session.execute(
-        select(MeetingRoom).where(
-            MeetingRoom.id == room_id,
-        )
-    )
-    db_room = db_room.scalar()
-    return db_room
-
-
-async def create_meeting_room(
-        new_room: MeetingRoomCreate, session: AsyncSession
-) -> MeetingRoom:
+async def crud_create_meeting_room(
+    new_room: SchemasMeetingRoomCreate, session: AsyncSession
+) -> ModelMeetingRoom:
     new_room_data = new_room.dict()
-    db_room = MeetingRoom(**new_room_data)
+    db_room = ModelMeetingRoom(**new_room_data)
     # Убираем контекстный менеджер, т.к. передаем сессию из вне
     # async with AsyncSessionLocal() as session:
     session.add(db_room)
@@ -52,16 +27,16 @@ async def create_meeting_room(
     return db_room
 
 
-async def read_all_rooms_db(session: AsyncSession):
-    db_rooms = await session.execute(select(MeetingRoom))
+async def crud_read_all_meeting_rooms_db(session: AsyncSession):
+    db_rooms = await session.execute(select(ModelMeetingRoom))
     db_rooms = db_rooms.scalars().all()
     return db_rooms
 
 
-async def update_meeting_room(
-        db_room: MeetingRoom,
-        room_in: MeetingRoomUpdate,
-        session: AsyncSession
+async def crud_update_meeting_room(
+    db_room: ModelMeetingRoom,
+    room_in: SchemasMeetingRoomUpdate,
+    session: AsyncSession,
 ):
     # Переводим объект с данными из БД в словарь
     obj_data = jsonable_encoder(db_room)
@@ -80,9 +55,9 @@ async def update_meeting_room(
     return db_room
 
 
-async def delete_room(
-        room: MeetingRoom,
-        session: AsyncSession,
+async def crud_delete_meeting_room(
+    room: ModelMeetingRoom,
+    session: AsyncSession,
 ):
     await session.delete(room)
     await session.commit()

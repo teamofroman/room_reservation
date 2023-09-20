@@ -2,61 +2,60 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
+from app.core.utils import check_unique_room_name, get_room_by_id
 from app.crud.meeting_room import (
-    create_meeting_room,
-    get_room_id_by_name,
-    read_all_rooms_db, get_room_by_id, update_meeting_room, delete_room,
+    crud_create_meeting_room,
+    crud_delete_meeting_room,
+    crud_read_all_meeting_rooms_db,
+    crud_update_meeting_room,
 )
-from app.schemas.meeting_room import MeetingRoomCreate, MeetingRoomDB, \
-    MeetingRoomUpdate
+from app.schemas.meeting_room import (
+    SchemasMeetingRoomCreate,
+    SchemasMeetingRoomDB,
+    SchemasMeetingRoomUpdate,
+)
 
 router = APIRouter(prefix='/meeting_rooms', tags=['Meeting rooms'])
 
 
-async def check_unique_room_name(room_name: str, session: AsyncSession):
-    room_id = await get_room_id_by_name(room_name, session)
-    if room_id is not None:
-        raise HTTPException(
-            status_code=422,
-            detail='Переговорная с таким именем уже существует',
-        )
-
-
 @router.post(
     '/',
-    response_model=MeetingRoomDB,
+    response_model=SchemasMeetingRoomDB,
     response_model_exclude_none=True,
+    summary='Create meeting room',
 )
-async def create_new_meeting_room(
-        meeting_room: MeetingRoomCreate,
-        session: AsyncSession = Depends(get_async_session),
+async def api_create_new_meeting_room(
+    meeting_room: SchemasMeetingRoomCreate,
+    session: AsyncSession = Depends(get_async_session),
 ):
     await check_unique_room_name(meeting_room.name, session)
-    new_room = await create_meeting_room(meeting_room, session)
+    new_room = await crud_create_meeting_room(meeting_room, session)
     return new_room
 
 
 @router.get(
     '/',
-    response_model=list[MeetingRoomDB],
+    response_model=list[SchemasMeetingRoomDB],
     response_model_exclude_none=True,
+    summary='Get list of meeting room',
 )
-async def get_all_meeting_room(
-        session: AsyncSession = Depends(get_async_session),
+async def api_get_all_meeting_room(
+    session: AsyncSession = Depends(get_async_session),
 ):
-    rooms = await read_all_rooms_db(session)
+    rooms = await crud_read_all_meeting_rooms_db(session)
     return rooms
 
 
 @router.patch(
     '/{meeting_room_id}/',
-    response_model=MeetingRoomDB,
+    response_model=SchemasMeetingRoomDB,
     response_model_exclude_none=True,
+    summary='Update meeting room information',
 )
-async def partially_update_meeting_room(
-        meeting_room_id: int,
-        obj_in: MeetingRoomUpdate,
-        session: AsyncSession = Depends(get_async_session)
+async def api_partially_update_meeting_room(
+    meeting_room_id: int,
+    obj_in: SchemasMeetingRoomUpdate,
+    session: AsyncSession = Depends(get_async_session),
 ):
     meeting_room = await get_room_by_id(meeting_room_id, session)
 
@@ -69,8 +68,8 @@ async def partially_update_meeting_room(
     if obj_in.name is not None:
         await check_unique_room_name(obj_in.name, session)
 
-    meeting_room = await update_meeting_room(
-        meeting_room, obj_in, session,
+    meeting_room = await crud_update_meeting_room(
+        meeting_room, obj_in, session
     )
 
     return meeting_room
@@ -78,12 +77,12 @@ async def partially_update_meeting_room(
 
 @router.delete(
     '/{meeting_room_id}/',
-    response_model=MeetingRoomDB,
+    response_model=SchemasMeetingRoomDB,
     response_model_exclude_none=True,
+    summary='Delete meeting room',
 )
-async def delete_meeting_room(
-        meeting_room_id: int,
-        session: AsyncSession = Depends(get_async_session)
+async def api_delete_meeting_room(
+    meeting_room_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     meeting_room = await get_room_by_id(meeting_room_id, session)
 
@@ -93,5 +92,5 @@ async def delete_meeting_room(
             detail='Переговорная не существует',
         )
 
-    meeting_room = await delete_room(meeting_room, session)
+    meeting_room = await crud_delete_meeting_room(meeting_room, session)
     return meeting_room
