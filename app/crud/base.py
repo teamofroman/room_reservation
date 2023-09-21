@@ -16,12 +16,12 @@ class CRUDBase:
                 self.model.id == obj_id
             )
         )
-        return db_obj.scalar().first()
+        return db_obj.scalars().first()
 
     async def get_multi(self, session: AsyncSession):
         """Получает все объекты из базы данных"""
         db_objs = await session.execute(select(self.model))
-        return db_objs.scalar().all()
+        return db_objs.scalars().all()
 
     async def create(self, obj_in, session: AsyncSession):
         """Создаем объект в базе данных"""
