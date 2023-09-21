@@ -12,9 +12,7 @@ class CRUDBase:
     async def get(self, obj_id: int, session: AsyncSession):
         """Получает объект из базы данных по его ID"""
         db_obj = await session.execute(
-            select(self.model).where(
-                self.model.id == obj_id
-            )
+            select(self.model).where(self.model.id == obj_id)
         )
         return db_obj.scalars().first()
 
@@ -49,10 +47,10 @@ class CRUDBase:
         return db_obj
 
     async def get_by_attribute(
-            self,
-            attr_name: str,
-            attr_value: str,
-            session: AsyncSession,
+        self,
+        attr_name: str,
+        attr_value: str,
+        session: AsyncSession,
     ):
         attr = getattr(self.model, attr_name)
         db_obj = await session.execute(
