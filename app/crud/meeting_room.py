@@ -3,15 +3,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # from app.core.db import AsyncSessionLocal
+from app.crud.base import CRUDBase
 from app.models.meeting_room import ModelMeetingRoom
 from app.schemas.meeting_room import (
     SchemasMeetingRoomCreate,
     SchemasMeetingRoomUpdate,
 )
 
+meeting_room_crud = CRUDBase(ModelMeetingRoom)
+
 
 async def crud_create_meeting_room(
-    new_room: SchemasMeetingRoomCreate, session: AsyncSession
+        new_room: SchemasMeetingRoomCreate, session: AsyncSession
 ) -> ModelMeetingRoom:
     new_room_data = new_room.dict()
     db_room = ModelMeetingRoom(**new_room_data)
@@ -34,9 +37,9 @@ async def crud_read_all_meeting_rooms_db(session: AsyncSession):
 
 
 async def crud_update_meeting_room(
-    db_room: ModelMeetingRoom,
-    room_in: SchemasMeetingRoomUpdate,
-    session: AsyncSession,
+        db_room: ModelMeetingRoom,
+        room_in: SchemasMeetingRoomUpdate,
+        session: AsyncSession,
 ):
     # Переводим объект с данными из БД в словарь
     obj_data = jsonable_encoder(db_room)
@@ -56,8 +59,8 @@ async def crud_update_meeting_room(
 
 
 async def crud_delete_meeting_room(
-    room: ModelMeetingRoom,
-    session: AsyncSession,
+        room: ModelMeetingRoom,
+        session: AsyncSession,
 ):
     await session.delete(room)
     await session.commit()

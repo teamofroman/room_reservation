@@ -3,12 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.core.utils import check_unique_room_name, get_room_by_id
-from app.crud.meeting_room import (
-    crud_create_meeting_room,
-    crud_delete_meeting_room,
-    crud_read_all_meeting_rooms_db,
-    crud_update_meeting_room,
-)
+from app.crud.meeting_room import meeting_room_crud
+# (
+#     crud_create_meeting_room,
+#     crud_delete_meeting_room,
+#     crud_read_all_meeting_rooms_db,
+#     crud_update_meeting_room,
+# )
 from app.schemas.meeting_room import (
     SchemasMeetingRoomCreate,
     SchemasMeetingRoomDB,
@@ -29,7 +30,8 @@ async def api_create_new_meeting_room(
     session: AsyncSession = Depends(get_async_session),
 ):
     await check_unique_room_name(meeting_room.name, session)
-    new_room = await crud_create_meeting_room(meeting_room, session)
+    # new_room = await crud_create_meeting_room(meeting_room, session)
+    new_room = await meeting_room_crud.create(meeting_room, session)
     return new_room
 
 
@@ -42,7 +44,8 @@ async def api_create_new_meeting_room(
 async def api_get_all_meeting_room(
     session: AsyncSession = Depends(get_async_session),
 ):
-    rooms = await crud_read_all_meeting_rooms_db(session)
+    # rooms = await crud_read_all_meeting_rooms_db(session)
+    rooms = await meeting_room_crud.get_multi(session)
     return rooms
 
 
@@ -68,7 +71,11 @@ async def api_partially_update_meeting_room(
     if obj_in.name is not None:
         await check_unique_room_name(obj_in.name, session)
 
-    meeting_room = await crud_update_meeting_room(
+    # meeting_room = await crud_update_meeting_room(
+    #     meeting_room, obj_in, session
+    # )
+
+    meeting_room = await meeting_room_crud.update(
         meeting_room, obj_in, session
     )
 
@@ -92,5 +99,6 @@ async def api_delete_meeting_room(
             detail='Переговорная не существует',
         )
 
-    meeting_room = await crud_delete_meeting_room(meeting_room, session)
+    # meeting_room = await crud_delete_meeting_room(meeting_room, session)
+    meeting_room = await meeting_room_crud.remove(meeting_room, session)
     return meeting_room
