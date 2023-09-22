@@ -47,10 +47,10 @@ class CRUDBase:
         return db_obj
 
     async def get_by_attribute(
-        self,
-        attr_name: str,
-        attr_value: str,
-        session: AsyncSession,
+            self,
+            attr_name: str,
+            attr_value: str,
+            session: AsyncSession,
     ):
         attr = getattr(self.model, attr_name)
         db_obj = await session.execute(
