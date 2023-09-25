@@ -17,7 +17,7 @@ class SchemaReservationDB(SchemaReservationBase):
 
 
 class SchemaReservationUpdate(SchemaReservationBase):
-    @validator('from_reverse')
+    @validator('from_reserve')
     def check_from_reserve_later_than_now(cls, value: datetime):
         if value <= datetime.now():
             raise ValueError(
