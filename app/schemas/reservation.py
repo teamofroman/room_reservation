@@ -2,13 +2,11 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, Extra, Field, root_validator, validator
 
-FROM_TIME = (
-        datetime.now() + timedelta(minutes=10)
-).isoformat(timespec='minutes')
+FROM_TIME = (datetime.now() + timedelta(minutes=10)).isoformat(
+    timespec='minutes'
+)
 
-TO_TIME = (
-        datetime.now() + timedelta(hours=1)
-).isoformat(timespec='minutes')
+TO_TIME = (datetime.now() + timedelta(hours=1)).isoformat(timespec='minutes')
 
 
 class SchemaReservationBase(BaseModel):

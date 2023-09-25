@@ -2,8 +2,11 @@
 from fastapi import APIRouter, HTTPException
 
 from app.core.user import auth_backend, fastapi_users
-from app.schemas.user import SchemasUserCreate, SchemasUserRead, \
-    SchemasUserUpdate
+from app.schemas.user import (
+    SchemasUserCreate,
+    SchemasUserRead,
+    SchemasUserUpdate,
+)
 
 router = APIRouter()
 
@@ -33,6 +36,5 @@ router.include_router(
 )
 def api_delete_user(id: str):
     raise HTTPException(
-        status_code=405,
-        detail='Удаление пользователей запрещено!'
+        status_code=405, detail='Удаление пользователей запрещено!'
     )

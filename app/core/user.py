@@ -2,10 +2,15 @@ from typing import Optional, Union
 
 from fastapi import Depends, Request
 from fastapi_users import (
-    BaseUserManager, FastAPIUsers, IntegerIDMixin, InvalidPasswordException
+    BaseUserManager,
+    FastAPIUsers,
+    IntegerIDMixin,
+    InvalidPasswordException,
 )
 from fastapi_users.authentication import (
-    AuthenticationBackend, BearerTransport, JWTStrategy
+    AuthenticationBackend,
+    BearerTransport,
+    JWTStrategy,
 )
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,15 +48,14 @@ auth_backend = AuthenticationBackend(
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[ModelUser, int]):
-
     # Здесь можно описать свои условия валидации пароля.
     # При успешной валидации функция ничего не возвращает.
     # При ошибке валидации будет вызван специальный класс ошибки
     # InvalidPasswordException.
     async def validate_password(
-            self,
-            password: str,
-            user: Union[SchemasUserCreate, ModelUser],
+        self,
+        password: str,
+        user: Union[SchemasUserCreate, ModelUser],
     ) -> None:
         if len(password) < 3:
             raise InvalidPasswordException(
@@ -64,7 +68,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[ModelUser, int]):
 
     # Пример метода для действий после успешной регистрации пользователя.
     async def on_after_register(
-            self, user: ModelUser, request: Optional[Request] = None
+        self, user: ModelUser, request: Optional[Request] = None
     ):
         # Вместо print здесь можно было бы настроить отправку письма.
         print(f'Пользователь {user.email} зарегистрирован.')

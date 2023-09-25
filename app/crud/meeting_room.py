@@ -11,7 +11,7 @@ meeting_room_crud = CRUDBase(ModelMeetingRoom)
 
 
 async def crud_create_meeting_room(
-        new_room: SchemasMeetingRoomCreate, session: AsyncSession
+    new_room: SchemasMeetingRoomCreate, session: AsyncSession
 ) -> ModelMeetingRoom:
     db_room = await meeting_room_crud.create(new_room, session)
 
@@ -24,9 +24,9 @@ async def crud_read_all_meeting_rooms_db(session: AsyncSession):
 
 
 async def crud_update_meeting_room(
-        db_room: ModelMeetingRoom,
-        room_in: SchemasMeetingRoomUpdate,
-        session: AsyncSession,
+    db_room: ModelMeetingRoom,
+    room_in: SchemasMeetingRoomUpdate,
+    session: AsyncSession,
 ):
     db_room = await meeting_room_crud.update(db_room, room_in, session)
 
@@ -34,8 +34,8 @@ async def crud_update_meeting_room(
 
 
 async def crud_delete_meeting_room(
-        room: ModelMeetingRoom,
-        session: AsyncSession,
+    room: ModelMeetingRoom,
+    session: AsyncSession,
 ):
     room = await meeting_room_crud.remove(room, session)
     return room
