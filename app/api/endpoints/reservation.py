@@ -26,3 +26,15 @@ async def api_create_new_reservation(
     )
     new_reservation = await reservation_crud.create(reservation, session)
     return new_reservation
+
+
+@router.get(
+    '/',
+    response_model=list[SchemaReservationDB],
+    summary='List of reserved room',
+)
+async def api_get_all_reserved_room(
+        session: AsyncSession = Depends(get_async_session)
+):
+    reserved_rooms = await reservation_crud.get_multi(session)
+    return reserved_rooms
