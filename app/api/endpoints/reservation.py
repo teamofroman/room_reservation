@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import check_room_exists, \
-    check_reservation_intersections
+    check_reservation_intersections, check_reservation_before_edit
 from app.core.db import get_async_session
 from app.crud.reservation import reservation_crud
 from app.schemas.reservation import SchemaReservationDB, \
@@ -38,3 +38,17 @@ async def api_get_all_reserved_room(
 ):
     reserved_rooms = await reservation_crud.get_multi(session)
     return reserved_rooms
+
+
+@router.delete(
+    '/{reservation_id:int}',
+    response_model=SchemaReservationDB,
+    summary='Remove room reservation',
+)
+async def api_delete_reservation(
+        reservation_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    reservation = await check_reservation_before_edit(reservation_id, session)
+    reservation = await reservation_crud.remove(reservation, session)
+    return reservation
