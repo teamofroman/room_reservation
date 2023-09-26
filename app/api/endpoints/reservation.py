@@ -7,7 +7,9 @@ from app.api.validators import (
     check_room_exists,
 )
 from app.core.db import get_async_session
+from app.core.user import current_user
 from app.crud.reservation import reservation_crud
+from app.models import ModelUser
 from app.schemas.reservation import (
     SchemaReservationCreate,
     SchemaReservationDB,
@@ -21,15 +23,16 @@ router = APIRouter()
     '/', response_model=SchemaReservationDB, summary='Reservation room'
 )
 async def api_create_new_reservation(
-    reservation: SchemaReservationCreate,
-    session: AsyncSession = Depends(get_async_session),
+        reservation: SchemaReservationCreate,
+        session: AsyncSession = Depends(get_async_session),
+        user: ModelUser = Depends(current_user),
 ):
     await check_room_exists(reservation.meetingroom_id, session)
     await check_reservation_intersections(
         **reservation.dict(),
         session=session,
     )
-    new_reservation = await reservation_crud.create(reservation, session)
+    new_reservation = await reservation_crud.create(reservation, session, user)
     return new_reservation
 
 
@@ -39,7 +42,7 @@ async def api_create_new_reservation(
     summary='List of reserved room',
 )
 async def api_get_all_reserved_room(
-    session: AsyncSession = Depends(get_async_session),
+        session: AsyncSession = Depends(get_async_session),
 ):
     reserved_rooms = await reservation_crud.get_multi(session)
     return reserved_rooms
@@ -51,7 +54,7 @@ async def api_get_all_reserved_room(
     summary='Remove room reservation',
 )
 async def api_delete_reservation(
-    reservation_id: int, session: AsyncSession = Depends(get_async_session)
+        reservation_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     reservation = await check_reservation_before_edit(reservation_id, session)
     reservation = await reservation_crud.remove(reservation, session)
@@ -64,9 +67,9 @@ async def api_delete_reservation(
     summary='Update room reservation',
 )
 async def api_update_reservation(
-    reservation_id: int,
-    obj_in: SchemaReservationUpdate,
-    session: AsyncSession = Depends(get_async_session),
+        reservation_id: int,
+        obj_in: SchemaReservationUpdate,
+        session: AsyncSession = Depends(get_async_session),
 ):
     reservation = await check_reservation_before_edit(reservation_id, session)
     await check_reservation_intersections(

@@ -1,6 +1,10 @@
+from typing import Optional
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import ModelUser
 
 
 class CRUDBase:
@@ -21,9 +25,18 @@ class CRUDBase:
         db_objs = await session.execute(select(self.model))
         return db_objs.scalars().all()
 
-    async def create(self, obj_in, session: AsyncSession):
+    async def create(
+            self,
+            obj_in,
+            session: AsyncSession,
+            user: Optional[ModelUser] = None,
+    ):
         """Создаем объект в базе данных"""
         obj_in_data = obj_in.dict()
+
+        if user:
+            obj_in_data['user_id'] = user.id
+
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
         await session.commit()
@@ -47,10 +60,10 @@ class CRUDBase:
         return db_obj
 
     async def get_by_attribute(
-        self,
-        attr_name: str,
-        attr_value: str,
-        session: AsyncSession,
+            self,
+            attr_name: str,
+            attr_value: str,
+            session: AsyncSession,
     ):
         attr = getattr(self.model, attr_name)
         db_obj = await session.execute(
