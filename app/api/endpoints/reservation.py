@@ -7,7 +7,7 @@ from app.api.validators import (
     check_room_exists,
 )
 from app.core.db import get_async_session
-from app.core.user import current_user
+from app.core.user import current_user, current_superuser
 from app.crud.reservation import reservation_crud
 from app.models import ModelUser
 from app.schemas.reservation import (
@@ -40,6 +40,7 @@ async def api_create_new_reservation(
     '/',
     response_model=list[SchemaReservationDB],
     summary='List of reserved room',
+    dependencies=[Depends(current_superuser)]
 )
 async def api_get_all_reserved_room(
         session: AsyncSession = Depends(get_async_session),
@@ -82,3 +83,19 @@ async def api_update_reservation(
         db_obj=reservation, obj_in=obj_in, session=session
     )
     return reservation
+
+
+@router.get(
+    '/my_reservations',
+    response_model=list[SchemaReservationDB],
+    summary='Get my reservations',
+    response_model_exclude={'user_id'},
+)
+async def api_get_my_reservations(
+        user: ModelUser = Depends(current_user),
+        session: AsyncSession = Depends(get_async_session),
+):
+    reservations = await reservation_crud.get_by_user(
+        user=user, session=session
+    )
+    return reservations

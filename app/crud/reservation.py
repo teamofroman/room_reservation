@@ -5,18 +5,18 @@ from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
-from app.models.reservation import ModelReservation
+from app.models import ModelReservation, ModelUser
 
 
 class CRUDReservation(CRUDBase):
     async def get_reservations_at_the_same_time(
-        self,
-        *,
-        from_reserve: datetime,
-        to_reserve: datetime,
-        meetingroom_id: int,
-        reservation_id: Optional[int] = None,
-        session: AsyncSession
+            self,
+            *,
+            from_reserve: datetime,
+            to_reserve: datetime,
+            meetingroom_id: int,
+            reservation_id: Optional[int] = None,
+            session: AsyncSession
     ) -> list[ModelReservation]:
         select_rtmt = select(ModelReservation).where(
             ModelReservation.meetingroom_id == meetingroom_id,
@@ -35,7 +35,7 @@ class CRUDReservation(CRUDBase):
         return reservations
 
     async def get_future_reservations_for_room(
-        self, meetingroom_id: int, session: AsyncSession
+            self, meetingroom_id: int, session: AsyncSession
     ) -> list[ModelReservation]:
         reservations = await session.execute(
             select(ModelReservation).where(
@@ -46,6 +46,19 @@ class CRUDReservation(CRUDBase):
 
         reservations = reservations.scalars().all()
         return reservations
+
+    async def get_by_user(
+            self,
+            user: ModelUser,
+            session: AsyncSession
+    ) -> list[ModelReservation]:
+        reservations = await session.execute(
+            select(ModelReservation).where(
+                ModelReservation.user_id == user.id,
+            )
+        )
+
+        return reservations.scalars().all()
 
 
 reservation_crud = CRUDReservation(ModelReservation)
