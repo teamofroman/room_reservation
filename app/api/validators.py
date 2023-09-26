@@ -3,16 +3,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.meeting_room import meeting_room_crud
 from app.crud.reservation import reservation_crud
-from app.models import ModelMeetingRoom, ModelReservation
+from app.models import ModelMeetingRoom, ModelReservation, ModelUser
 
 
 async def check_room_name_duplicate(
     room_name: str, session: AsyncSession
 ) -> None:
-    room = await meeting_room_crud.get_by_attribute('name', room_name, session)
+    room = await meeting_room_crud.get_by_attribute("name", room_name, session)
     if room is not None:
         raise HTTPException(
-            status_code=422, detail='Комната с таким именем уже существует!'
+            status_code=422, detail="Комната с таким именем уже существует!"
         )
 
 
@@ -21,7 +21,7 @@ async def check_room_exists(
 ) -> ModelMeetingRoom:
     room = await meeting_room_crud.get(room_id, session)
     if room is None:
-        raise HTTPException(status_code=422, detail='Комната не найдена!')
+        raise HTTPException(status_code=422, detail="Комната не найдена!")
 
     return room
 
@@ -35,12 +35,19 @@ async def check_reservation_intersections(**kwargs) -> None:
 
 
 async def check_reservation_before_edit(
-    reservation_id: int, session: AsyncSession
+    reservation_id: int, user: ModelUser, session: AsyncSession
 ) -> ModelReservation:
     reservation = await reservation_crud.get(reservation_id, session)
     if reservation is None:
         raise HTTPException(
             status_code=422,
-            detail='Бронирование не найдено!',
+            detail="Бронирование не найдено!",
         )
+
+    if not user.is_superuser and reservation.user_id != user.id:
+        raise HTTPException(
+            status_code=403,
+            detail='Невозможно редактировать или удалить чужую бронь!',
+        )
+
     return reservation

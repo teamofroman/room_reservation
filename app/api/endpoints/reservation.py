@@ -23,9 +23,9 @@ router = APIRouter()
     '/', response_model=SchemaReservationDB, summary='Reservation room'
 )
 async def api_create_new_reservation(
-        reservation: SchemaReservationCreate,
-        session: AsyncSession = Depends(get_async_session),
-        user: ModelUser = Depends(current_user),
+    reservation: SchemaReservationCreate,
+    session: AsyncSession = Depends(get_async_session),
+    user: ModelUser = Depends(current_user),
 ):
     await check_room_exists(reservation.meetingroom_id, session)
     await check_reservation_intersections(
@@ -40,10 +40,10 @@ async def api_create_new_reservation(
     '/',
     response_model=list[SchemaReservationDB],
     summary='List of reserved room',
-    dependencies=[Depends(current_superuser)]
+    dependencies=[Depends(current_superuser)],
 )
 async def api_get_all_reserved_room(
-        session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     reserved_rooms = await reservation_crud.get_multi(session)
     return reserved_rooms
@@ -55,9 +55,16 @@ async def api_get_all_reserved_room(
     summary='Remove room reservation',
 )
 async def api_delete_reservation(
-        reservation_id: int, session: AsyncSession = Depends(get_async_session)
+    reservation_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    user: ModelUser = Depends(current_user),
 ):
-    reservation = await check_reservation_before_edit(reservation_id, session)
+    """Для суперюзеров или создателей объекта бронирования"""
+    reservation = await check_reservation_before_edit(
+        reservation_id=reservation_id,
+        session=session,
+        user=user,
+    )
     reservation = await reservation_crud.remove(reservation, session)
     return reservation
 
@@ -68,11 +75,17 @@ async def api_delete_reservation(
     summary='Update room reservation',
 )
 async def api_update_reservation(
-        reservation_id: int,
-        obj_in: SchemaReservationUpdate,
-        session: AsyncSession = Depends(get_async_session),
+    reservation_id: int,
+    obj_in: SchemaReservationUpdate,
+    session: AsyncSession = Depends(get_async_session),
+    user: ModelUser = Depends(current_user),
 ):
-    reservation = await check_reservation_before_edit(reservation_id, session)
+    """Для суперюзеров или создателей объекта бронирования"""
+    reservation = await check_reservation_before_edit(
+        reservation_id=reservation_id,
+        session=session,
+        user=user,
+    )
     await check_reservation_intersections(
         **obj_in.dict(),
         reservation_id=reservation_id,
@@ -92,8 +105,8 @@ async def api_update_reservation(
     response_model_exclude={'user_id'},
 )
 async def api_get_my_reservations(
-        user: ModelUser = Depends(current_user),
-        session: AsyncSession = Depends(get_async_session),
+    user: ModelUser = Depends(current_user),
+    session: AsyncSession = Depends(get_async_session),
 ):
     reservations = await reservation_crud.get_by_user(
         user=user, session=session
