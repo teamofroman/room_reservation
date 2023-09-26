@@ -26,10 +26,10 @@ class CRUDBase:
         return db_objs.scalars().all()
 
     async def create(
-            self,
-            obj_in,
-            session: AsyncSession,
-            user: Optional[ModelUser] = None,
+        self,
+        obj_in,
+        session: AsyncSession,
+        user: Optional[ModelUser] = None,
     ):
         """Создаем объект в базе данных"""
         obj_in_data = obj_in.dict()
@@ -60,10 +60,10 @@ class CRUDBase:
         return db_obj
 
     async def get_by_attribute(
-            self,
-            attr_name: str,
-            attr_value: str,
-            session: AsyncSession,
+        self,
+        attr_name: str,
+        attr_value: str,
+        session: AsyncSession,
     ):
         attr = getattr(self.model, attr_name)
         db_obj = await session.execute(

@@ -7,7 +7,7 @@ from app.api.validators import (
     check_room_exists,
 )
 from app.core.db import get_async_session
-from app.core.user import current_user, current_superuser
+from app.core.user import current_superuser, current_user
 from app.crud.reservation import reservation_crud
 from app.models import ModelUser
 from app.schemas.reservation import (

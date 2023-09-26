@@ -24,8 +24,8 @@ router = APIRouter()
     dependencies=[Depends(current_superuser)],
 )
 async def api_create_new_meeting_room(
-        meeting_room: SchemasMeetingRoomCreate,
-        session: AsyncSession = Depends(get_async_session),
+    meeting_room: SchemasMeetingRoomCreate,
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Только для администраторов."""
     await check_room_name_duplicate(meeting_room.name, session)
@@ -40,7 +40,7 @@ async def api_create_new_meeting_room(
     summary='Get list of meeting room',
 )
 async def api_get_all_meeting_room(
-        session: AsyncSession = Depends(get_async_session),
+    session: AsyncSession = Depends(get_async_session),
 ):
     rooms = await meeting_room_crud.get_multi(session)
     return rooms
@@ -54,9 +54,9 @@ async def api_get_all_meeting_room(
     dependencies=[Depends(current_superuser)],
 )
 async def api_partially_update_meeting_room(
-        meeting_room_id: int,
-        obj_in: SchemasMeetingRoomUpdate,
-        session: AsyncSession = Depends(get_async_session),
+    meeting_room_id: int,
+    obj_in: SchemasMeetingRoomUpdate,
+    session: AsyncSession = Depends(get_async_session),
 ):
     meeting_room = await check_room_exists(meeting_room_id, session)
 
@@ -78,8 +78,7 @@ async def api_partially_update_meeting_room(
     dependencies=[Depends(current_superuser)],
 )
 async def api_delete_meeting_room(
-        meeting_room_id: int,
-        session: AsyncSession = Depends(get_async_session)
+    meeting_room_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     meeting_room = await check_room_exists(meeting_room_id, session)
 
@@ -94,8 +93,7 @@ async def api_delete_meeting_room(
     response_model_exclude={'user_id'},
 )
 async def api_get_reservations_for_room(
-        meeting_room_id: int,
-        session: AsyncSession = Depends(get_async_session)
+    meeting_room_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     await check_room_exists(meeting_room_id, session)
     reservations = await reservation_crud.get_future_reservations_for_room(
