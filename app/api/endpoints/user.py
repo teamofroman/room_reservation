@@ -10,6 +10,19 @@ from app.schemas.user import (
 
 router = APIRouter()
 
+
+@router.delete(
+    '/users/{id}',
+    tags=['users'],
+    deprecated=True,
+)
+def api_delete_user(id: str):
+    # В этом месте метод ОТРАБАТЫВАЕТ, но НЕ является deprecated
+    raise HTTPException(
+        status_code=405, detail='Удаление пользователей запрещено!'
+    )
+
+
 router.include_router(
     # В роутер аутентификации
     # передается объект бэкенда аутентификации.
@@ -35,6 +48,8 @@ router.include_router(
     deprecated=True,
 )
 def api_delete_user(id: str):
+    # В этом месте метод НЕ отрабатывает, но ЯВЛЯЕТСЯ deprecated
+    # Плюс на лицо дублирование кода :(
     raise HTTPException(
         status_code=405, detail='Удаление пользователей запрещено!'
     )
