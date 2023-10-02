@@ -1,0 +1,15 @@
+# curl -X 'POST'
+#  'http://127.0.0.1:8000/auth/jwt/login'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/x-www-form-urlencoded'
+#  -d 'grant_type=&username=glav%40user.ru&password=password&scope=&client_id=&client_secret='
+POST http://127.0.0.1:8000/auth/jwt/login
+accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+username=glav%40user.ru&password=password
+
+###
+DELETE http://127.0.0.1:8000/users/2
+accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMyIsImF1ZCI6WyJmYXN0YXBpLXVzZXJzOmF1dGgiXSwiZXhwIjoxNjk2MjM1MjI1fQ.YO114ZaeqmGSuYg2uZLKuw-DK3HudKG5SOc-9RaTIk0
